@@ -307,12 +307,15 @@ static bool server_send_rspmem_persistent(
 
     stream = ogs_pool_cycle(&stream_pool, stream);
     if (!stream) {
-        ogs_error("stream has already been closed");
+        ogs_error("stream has already been removed");
         return true;
     }
 
-    sbi_sess = stream->session;
-    ogs_assert(sbi_sess);
+    sbi_sess = ogs_pool_cycle(&session_pool, stream->session);
+    if (!sbi_sess) {
+        ogs_error("session has already been removed");
+        return true;
+    }
     ogs_assert(sbi_sess->session);
 
     sock = sbi_sess->sock;
